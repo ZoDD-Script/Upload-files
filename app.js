@@ -1,7 +1,8 @@
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const fs = require('fs')
-const uploadRouter = require('./routes/uploadRoute') 
+const uploadRoute = require('./routes/uploadRoute') 
 
 const app = express()
 
@@ -17,6 +18,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/v1', uploadRouter)
+app.use('/api/v1', uploadRoute)
 
 module.exports = app;

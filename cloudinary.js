@@ -1,33 +1,29 @@
-const dotenv = require('dotenv')
-dotenv.config({ path: './config.env' })
-
-const cloudinary = require('cloudinary').v2;
+const { Readable } = require('stream');
+const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
-const uploadFile = (path, folder) => {
-  console.log('3')
-
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(
-      path,
-      { folder: folder },
-      (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
+const uploadFile = (buffer, folder) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+        { folder: folder, resource_type: 'auto' },
+        (error, result) => {
+            if (error) {
+            reject(error);
+            } else {
+            resolve(result);
+            }
         }
-      }
-    );
-    console.log('4')
-
-  });
+        );
+        const readableStream = new Readable();
+        readableStream.push(buffer);
+        readableStream.push(null);
+        readableStream.pipe(stream);
+    });
 };
 
 module.exports = { uploadFile };
-

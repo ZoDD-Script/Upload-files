@@ -2,22 +2,20 @@ const multer = require('multer');
 const path = require('path');
 
 // set up Multer storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log('1')
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      new Date().toISOString().replace(/:/g, '-') +
-        path.extname(file.originalname)
-    );
-    console.log('2')
+const storage = multer.memoryStorage();
 
-  },
-});
+const multerFilter = (req, file, cb) => {
+  // console.log(file)
+  if (file.mimetype.startsWith('image/') ||
+      file.mimetype.startsWith('video/') ||
+      file.mimetype === 'application/pdf') {
+    cb(null, true); // Accept the file
+  } else {
+    cb(new Error('File type not supported'), false); // Reject the file
+  }
+}
 
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: storage, fileFilter: multerFilter });
 
 module.exports = upload;
